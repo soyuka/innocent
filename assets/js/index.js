@@ -1,10 +1,60 @@
 jQuery(function($) {
 
+	var body = $('body');
+
+	/* ==========================================================================
+	   Run Highlight
+	   ========================================================================== */
+
+		function highlight() {
+			$('pre code').each(function(i, e) {
+				hljs.highlightBlock(e)
+			});
+		}
+		highlight();
+
 	/* ==========================================================================
 	   Fitvids by Chris Coyier
 	   ========================================================================== */
 
-	$('#wrapper').fitVids();
+		function video() {
+			$('#wrapper').fitVids();
+		}
+		video();
+		
+	/* ==========================================================================
+	   Add class for ajax loading
+	   ========================================================================== */
+		
+		function ajaxLinkClass() {
+			$('.post-meta a').each(function() {
+				var link = $(this);
+				if (link.attr('href').indexOf('tag') > -1) {
+					link.addClass('js-tag-index js-ajax-link');
+				} else if (link.attr('href').indexOf('author') > -1) {
+					link.addClass('js-author-index js-ajax-link');
+				}
+			});
+			$('.pagination a').each(function() {
+				var link = $(this);
+				if (link.attr('href').length < 2 ) {
+					link.addClass('js-show-index js-ajax-link');
+				} else {
+					link.addClass('js-archive-index js-ajax-link');
+				}				
+			});
+		}
+		ajaxLinkClass();
+		
+	/* ==========================================================================
+	   Reload all scripts after AJAX load
+	   ========================================================================== */
+		
+		function reload() {
+			ajaxLinkClass();
+			highlight();
+			video();
+		}
 
 	/* ==========================================================================
 	   Ajax Loading based on Ghostwriter by Rory Gibson - https://github.com/roryg/ghostwriter
@@ -12,100 +62,63 @@ jQuery(function($) {
 
     var History = window.History;
     var loading = false;
-    var showIndex = true;
-    var $ajaxContainer = $('#ajax-container');
-    var $postIndex = $('#post-index');
-    var $blogLink = $('.js-show-index');
+    var ajaxContainer = $('#ajax-container');
 
-    // Initially hide the index and show the latest post
-    $postIndex.show();
-
-    // Show the index if the url has "page" in it (a simple
-    // way of checking if we're on a paginated page.)
-    if (window.location.pathname.indexOf('page') === 1) {
-        $postIndex.show();
+    if (!History.enabled) {
+    	return false;
     }
-
-    // Check if history is enabled for the browser
-    if ( ! History.enabled) {
-        return false;
-    }
-
     History.Adapter.bind(window, 'statechange', function() {
         var State = History.getState();
-
-        // Get the requested url and replace the current content
-        // with the loaded content
         $.get(State.url, function(result) {
             var $html = $(result);
             var $newContent = $('#ajax-container', $html).contents();
+            var title = result.match(/<title>(.*?)<\/title>/)[1];
 
-            $('html, body').animate({'scrollTop': 0});
-
-            $ajaxContainer.fadeOut(500, function() {
-                $postIndex = $newContent.filter('#post-index');
-
-                if (showIndex === true) {
-                } else {
-                }
-
-                $ajaxContainer.html($newContent);
-                $ajaxContainer.fadeIn(500);
-				
+            ajaxContainer.fadeOut(500, function() {
+                document.title = title;
+                ajaxContainer.html($newContent);
+                ajaxContainer.fadeIn(500);
                 NProgress.done();
-				$('#site-footer').fadeIn(100);
-                $('pre code').each(function(i, e) {hljs.highlightBlock(e)});
-                //hljs.initHighlightingOnLoad();                
-                $('#wrapper').fitVids();
+                              $('#site-footer').fadeIn(100);
 
+                reload();
                 loading = false;
-                showIndex = false;
             });
         });
     });
-
-    $('body').on('click', '.js-ajax-link, .pagination a', function(e) {
+    $('body').on('click', '.js-ajax-link', function(e) {
         e.preventDefault(); 
-
         if (loading === false) {
             var currentState = History.getState();
-            var url = $(this).attr('href');
+            var url = $(this).prop('href');
             var title = $(this).attr('title') || null;
 
-            // If the requested url is not the current states url push
-            // the new state and make the ajax call.
-            if (url !== currentState.url.replace(/\/$/, "")) {
+            if (url.replace(/\/$/, "") !== currentState.url.replace(/\/$/, "")) {
                 loading = true;
-
-                // Check if we need to show the post index after we've
-                // loaded the new content
-                if ($(this).hasClass('js-show-index') || $(this).parent('.pagination').length > 0) {
-                    showIndex = true;
-                }
-                
-                if ($(this).hasClass('post-link')) {
-					$blogLink.addClass('single');
-
-				} else if($(this).hasClass('js-show-index')) {
-					if($(this).hasClass('single')) {}
-					$blogLink.removeClass('single');
-
+                var link = $(this);
+                if (link.hasClass('js-show-post')) {
+                	body.removeClass();
+					body.addClass('post-template');
+				} else if(link.hasClass('js-show-index')) {
+                	body.removeClass();
+					body.addClass('home-template');
+				} else if(link.hasClass('js-tag-index')) {
+                	body.removeClass();
+					body.addClass('tag-template');
+					var tag = link.attr('href').match(/\/tag\/([^\/]+)/)[1];
+					body.addClass('tag-' + tag);
+				} else if(link.hasClass('js-author-index')) {
+                	body.removeClass();
+					body.addClass('author-template');
+					var author = link.attr('href').match(/\/author\/([^\/]+)/)[1];
+					body.addClass('author-' + author);
+				} else if(link.hasClass('js-archive-index')) {
+                	body.removeClass();
+					body.addClass('archive-template');
 				}
                 NProgress.start();
 
                 History.pushState({}, title, url);
-            } else {
-            
-                // Swap in the latest post or post index as needed
-                if (!$(this).hasClass('js-show-index')) {
-                    $('html, body').animate({'scrollTop': 0});
-
-                    NProgress.start();
-
-                    $postIndex.fadeOut(300, function() {
-                        NProgress.done();
-                    });
-                }
             }
         }
     });
