@@ -183,7 +183,8 @@ code, tt {
 pre {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    margin: 64px 0;
+    margin: 32px 0;
+    max-height: 630px;
     border: 1px solid #efefef;
     width: 100%;
     padding: 16px;
@@ -192,6 +193,8 @@ pre {
     overflow: auto;
     background: #f4f4f4;
 }
+
+pre code { overflow: auto; }
 
 pre code, tt {
 	font-size: 0.8em;
