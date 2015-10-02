@@ -1,17 +1,21 @@
 {{!< default}}
 
-<header id="main-header">
+<header id="main-header"{{#if @blog.cover}} class="has-cover"{{/if}}>
 	<nav id="main-nav">
-		<a class="subscribe" id="rss-link" href="{{@blog.url}}/rss/"><i class="fa fa-rss"></i> RSS</a>
+		<span id="nav-link">
+			{{navigation}}
+			<a class="subscribe" href="{{@blog.url}}/rss/"><i class="icon-rss"></i> RSS</a>
+		</span>
 	</nav>
-	<div class="inner">
+	<a class="site-title" class="js-ajax-link js-show-index" href="{{@blog.url}}">
 		{{#if @blog.logo}}
-			<a class="js-ajax-link js-show-index" id="blog-logo" href="{{@blog.url}}"><img src="{{@blog.logo}}" alt="Blog Logo" /></a>
-			<h1 class="page-title"><a class="js-ajax-link js-show-index" id="blog-logo-title" href="{{@blog.url}}">{{@blog.title}}</a></h1>
-		{{else}}
-			<h1 class="page-title"><a class="js-ajax-link js-show-index" id="page-title" href="{{@blog.url}}">{{@blog.title}}</a></h1>
+			<span class="site-logo"><img src="{{@blog.logo}}" alt="Logo" /></span>
 		{{/if}}
-	</div>
+			<h1 class="site-name">{{@blog.title}}</h1>
+		{{#if @blog.description}}
+			<span class="site-description">{{@blog.description}}</span>
+		{{/if}}
+	</a>
 	{{#if @blog.cover}}
 		<div class="site-cover" style="background-image: url({{@blog.cover}})"></div>
 	{{/if}}
