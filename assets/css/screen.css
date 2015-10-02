@@ -163,30 +163,32 @@ code, tt {
 }
 
 pre {
-    margin: 40px auto;
-    border: 1px solid #d8dfe5;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 32px 0;
+    max-height: 630px;
+    border: 1px solid #efefef;
     width: 100%;
-    padding: 19px;
+    padding: 16px;
     font-family: 'Inconsolata', monospace, sans-serif;
     white-space: pre;
     overflow: auto;
-    background: #f7f9fa;
-    box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    border-radius: 2px;
-    -webkit-border-radius: 2px;
+    background: #f4f4f4;
 }
 
+pre code { overflow: auto; }
+
 pre code, tt {
-    font-size: 0.75em;
-    line-height: 2em;
-    white-space: -moz-pre-wrap;
-    white-space: pre-wrap;
-    background: transparent;
-    border: none;
-    padding: 0;
-    vertical-align: inherit;
+	font-size: 0.8em;
+	line-height: 1.6em;
+	white-space: -moz-pre-wrap;
+	white-space: pre-wrap;
+	background: transparent;
+	border: none;
+	padding: 0;
+	vertical-align: inherit;
 }
+
 
 kbd {
     display: inline-block;
